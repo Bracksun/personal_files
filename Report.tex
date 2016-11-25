@@ -1,0 +1,236 @@
+\documentclass[12]{article}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subfigure}
+
+\setlength{\parskip}{0in} \setlength{\textheight}{9.5in}
+\setlength{\textwidth}{6in} \topmargin11in \advance \topmargin
+-\textheight \divide \topmargin by 2\advance \topmargin -1.5in
+\leftmargin 8.5in \advance \leftmargin-\textwidth \divide
+\leftmargin by 2 \advance \leftmargin -1in\oddsidemargin \leftmargin
+\evensidemargin \leftmargin
+\date{July 7th 2011}
+
+\begin{document}\large%%define the size of font
+\title{Report: Multilevel Coding}
+\author{Wenbo Sun}
+
+\maketitle
+
+\section*{Review of linear codes}
+Let us think about how well we can represent a code. In general, a code $C : \{0,1\}^k\rightarrow\{0,1\}^n$ can be
+stored using $n2^k$ bits, which is exponential space for modest value of $k$ like $k=100$. Linear codes have succinct
+representation of the code that only $nk$ bits space is needed.
+
+First let us prove Shannon theorem by linear codes.
+\subsection*{Achievability}
+\begin{itemize}
+	\item Random linear codebook generation: Let $k=\lceil nR\rceil$ and $(u_1,u_2,\dots,u_k)\in\{0,1\}^k$
+		be the binary expansion of the message $m\in[1:2^k]$.
+		Generate a random codebook that each codeword $x^n(u^k)$ is a linear function of $u^k$. Let\\
+		\begin{equation*}
+		[	\begin{array}{cccc}
+     x_1 & x_2 & \cdots & x_n 
+   \end{array}]
+   =
+     [\begin{array}{cccc}
+       u_1 & u_2 & \cdots & u_k \\
+     \end{array}]
+     \left(
+     \begin{array}{cccc}
+       g_{11} & g_{12} & \cdots & g_{1n} \\
+       g_{21} & g_{22} & \cdots & g_{2n} \\
+       \vdots & \vdots & \ddots & \vdots \\
+       g_{k1} & g_{k2} & \cdots & g_{kn} \\
+     \end{array}
+     \right)
+		\end{equation*}
+		where $g_{ij}\in\{0,1\}, i\in[1:k],j\in[1:n]$, are generated i.i.d. according to Bern(1/2)
+	\item Let us check the following results
+		\begin{enumerate}
+			\item $X_1(u^k),\dots,X_n(u^k)$ are i.i.d. Bern(1/2) for each $u^k$\\
+				\emph{Proof}: As we know,
+				\begin{equation*}
+					\begin{split}
+					X_m(u^k)=\mathbf{u g_m}\\
+					X_n(u^k)=\mathbf{u g_n}
+				\end{split}
+				\end{equation*}
+				where $X_m(u^k)$ is the $m$-th position in codeword and $g_m$ is the $m$-th column
+				in generator matrix $\mathbf{G}$. Thus $X_m(u^k)$ is a linear combination of
+				$g_m$, and $X_n(u^k)$ is a linear combination of $g_n$. Every element in $\mathbf{G}$
+				is i.i.d. Bern(1/2) process, so $X_m(u^k)$ and $X_n(u^k)$ are independent. Meanwhile,
+				sum of two independent Bern(1/2) random variables is also a Bern(1/2) random variable,
+				which proves $X_m(u^k)$ and $X_n(u^k)$ follow Bern(1/2) distribution. Therefore, all
+				elements in $X^n(u^k)$ are i.i.d. Bern(1/2) process.
+			\item $X^n(u^k)$ and $X^n(\tilde{u}^k)$ are independent for each $u^k\neq\tilde{u}^k$\\
+				\emph{Proof}: $X^n(u^k)$ is a linear summation of $i$-th row of $\mathbf{G}$ for 
+				$u_i=1$, where $i$ is from $1$ to $k$. For $u^k$ and $\tilde{u}^k$, we assume there is
+				one position $i$ different in these two messages, that is $u^k_i=0$ and $\tilde{u}^k_i=1$.
+				Thus, $X^n(\tilde{u}^k)=X^n(u^k)+\mathbf{g_i}$, where $\mathbf{g_i}$ is the $i$-th row
+				of $\mathbf{G}$. According to codebook generation, all elements in $\mathbf{G}$ are i.i.d.
+				process, which means $X^n(u^k)$ and $\mathbf{g_i}$ are independent. Therefore, $
+				X^n(u^K)$ and $X^n(\tilde{u}^k)$ are independent sequences, at least pairwise independent.
+				In fact, three or more codewords may be dependent.
+		\end{enumerate}
+	\item For the DMC, probability of channel is $p(y^n|x^n(u^k))=\prod_{i=n}^{n}p(y_i|x_i(u^k))$.
+	\item Encoding and decoding scheme is same to the proof on Lecture notes and we use joint typicality decoding.
+	\item Without loss of generality, we assume that $M=1$ is sent
+		\begin{equation*}
+			\begin{split}
+				\varepsilon_1&:=\{(X^n(1),Y^n)\not\in T^{(n)}_\epsilon\}\\
+				\varepsilon_2&:=\{(X^n(m),Y^n)\in T^{(n)}_\epsilon~for~some~m\neq1\}
+		\end{split}
+		\end{equation*}
+		By union bound, $P(\varepsilon)=P(\varepsilon_1\cup\varepsilon_2)\leq P(\varepsilon_1)
+		+P(\varepsilon_2)$
+		\begin{itemize}
+			\item For the first term, $P(\varepsilon_1)\rightarrow0$ as $n\rightarrow0$ by LLN
+			\item For the second term, $(X^n(m),Y^n)\sim\prod^n_{i=1}p_X(x_i)p_Y(y_i)$,which means $X^n(m)$
+				and $Y^n$ are pairwise independent. Thus by packing lemma
+				$P\{(X^n(m),Y^n)\in T^{(n)}_\epsilon$ for some $m\neq1\}$ as $n\rightarrow\infty$, if
+				$R<I(X;Y)-\delta(\epsilon)$
+		\end{itemize}
+	\item Note that since the probability of error averaged over codebook $P(e)\rightarrow0$.
+		Thus there must exist a good linear code $(n,k)$ with $P(e)\rightarrow0$. This proves that $R<I(X;Y)$ is
+		achievable over uniform distribution for binary linear code.
+\end{itemize}
+\subsection*{Converse}
+\begin{equation*}
+	\begin{split}
+		nR&=H(M)\\
+		&=I(M;Y^n)\\
+		&=I(M,X^n(M);Y^n)\\
+		&=H(Y^n)-H(Y^n|X^n)\\
+		&=\sum_{i=1}^n[H(Y_i|Y_1,Y_2,\dots,Y_{i-1})-H(Y_i|X^n,Y_1,Y_2,\dots,Y_{i-1})]\\
+		&\leq\sum_{i=1}^n[H(Y_i)-H(Y_i|X^n,Y_1,Y_2,\dots,Y_{i-1})]\\
+		&=\sum_{i=1}^n[H(Y_i)-H(Y_i|X_i)]\\
+		&=\sum_{i=1}^nI(X_i;Y_i)\\
+	\end{split}
+\end{equation*}
+Rate is less than or equal to average mutual information between $X$ and $Y$ over empirical
+distribution $p(x)$ on every column of codebook. 
+
+With loss of generality, assume one element $X_{mi}$ in i-th column of codebook is 1, $x_{mi}
+= \mathbf{u_m\cdot g_i}=1$, where $\mathbf{g_i}$ is the i-th column of generator matrix $\mathbf{G}$ and  $\mathbf{u_m}
+= (u_{m1},u_{m2},\ldots,u_{mk})$. So, we can generate another message $\mathbf{u_n}=(1-u_{m1},u_{m2},\ldots,u_{mk})$
+that one element in this message $\mathbf{u_m}$ is flipped, so $X_{ni}=\mathbf{u_n\cdot g_i}=0$.
+Therefore, if there is a ''1'' in i-th column of codebook, there always be a ''0''
+in the same column. That is, $p(x)$ follows Bern(1/2) for every column of codebook.
+
+$R\leq I(X;Y)$ when $X$ is uniformly distributed.\\
+
+\section*{Superposition coding scheme}
+\begin{itemize}
+	\item Deterministic mapping: we use a deterministic mapping function $f: W\rightarrow X$, 
+		where $W\in\{0,1\}^m$ and $X
+\in\chi$($\chi$ is the set of all possible channel input symbols). For example, consider the channel with Non-uniform
+input(NUI), i.e., $p_1=P(X=1)=1/4$ and $p_0=P(X=0)=3/4$. A possible deterministic mapper is
+$\{00\}\rightarrow\{1\}$ and $\{01,10,11\} \rightarrow\{0\}$, as figure 1. Since $W$ is uniformly
+distributed, the mapper can induce the desired distribution on $\chi$.
+Note by using linear codes with deterministic mapper, we can only obtain probabilities of the form $k/2^m$, which we can
+approximate the desired distribution by increasing $m$.\\
+  \begin{figure}
+\centering
+  \includegraphics[width=0.3\textwidth]{1.eps}
+ \caption{An example of a deterministic mapper}
+\label{1}
+\end{figure}
+\item Codebook generation: Design two binary code generator matrices $\mathbf{G_1}[k\times n]$ and
+$\mathbf{G_2}[k\times 2n]$, where $k$ is the length of message and $n$ is the length of codeword.
+
+Generate codewords $\mathbf{X_U}=\mathbf{U}\cdot \mathbf{G_1}$, where each $\mathbf{x_U^n}$ is i.i.d. Bern(1/2) sequence.
+
+Generate codewords $\mathbf{X_V'}=\mathbf{V}\cdot \mathbf{G_2}$, which is a $2^{k}\times 2n$ codebook and each codeword is
+i.i.d. Bern(1/2) sequence. By the deterministic mapping function we mentioned above, every two columns $
+\mathbf{W_1}$ and $\mathbf{W_2}$ in codebook can be mapped into one column $\mathbf{X_V}$.
+\begin{equation*}
+\mathbf{ W_1~~~W_2}\rightarrow\mathbf{ X_V}
+\end{equation*}
+For whole codebook, 
+\begin{equation*}
+      [ \begin{array}{ccccccc}
+	       \mathbf{W_1} & \mathbf{W_2} & \mathbf{W_1} & \mathbf{W_2} & \cdots & \mathbf{W_1} & \mathbf{W_2} \\
+       \end{array}]
+     \rightarrow
+       [\begin{array}{cccc}
+	       \mathbf{X_V} & \mathbf{X_V} & \cdots & \mathbf{X_V} \\
+       \end{array}]
+\end{equation*}
+
+So, we can get a $2^k\times n$ codebook that every codeword $X_V$ is i.i.d. Bern(1/4)
+sequence.
+
+\item Encoding: To send $(u,v)$, transmit $x^n(u,v)=x_U^n(u)\oplus x_V^n(v)$
+
+\item Decoding: \\
+Decoder 2 decodes $u$ from $y^n_2=x_U^n(u)\oplus (x_V^n(v)\oplus z^n_2)$ considering $x_V^n(v)$ as noise. $u$ can
+be decoded with probability of error $\rightarrow 0$ as $n\rightarrow\infty$ if $R_2\leq I(U;U\oplus V\oplus Z_2)
+=H(U)-H(V\oplus Z_2)$
+
+Decoder 1 uses successive cancellation: It first decodes $u$ from $y^n_1=x_U^n(u)\oplus (x_V^n(v)\oplus z^n_1)$,
+subtracts off $x_U^n(u)$, then decodes $v$ from $x_v^n(v)\oplus z^n_1$. $v$ can
+be decoded with probability of error $\rightarrow 0$ as $n\rightarrow\infty$ if $R_1\leq I(V;V\oplus Z_1)
+=H(V\oplus Z_1)-H(Z_1)$
+\end{itemize}
+\subsection*{Information rate of channel}
+We have proved binary linear code can achieve $I(X;Y)$ when the input is uniform distribution. Now our problem is to prove
+information rate of channel with NUI can be achieved by MLC scheme above.
+
+Argument: The proposed coding scheme can achieve the information rate of the DMC with NUI, 
+$I(W;Y)=I(X;Y)$.\\\\
+Proof:
+\begin{equation*}
+	\begin{split}
+		I(W;Y,X)&=I(W;X)+I(W;Y|X)\\
+		&=I(W;Y)+I(W;X|Y)
+	\end{split}
+\end{equation*}
+Note that $W\rightarrow X\rightarrow Y$ forms a Markov chain that $I(W;Y|X)=0$, thus
+\begin{equation*}
+	\begin{split}
+		I(W;Y)&=I(W;X)-I(W;X|Y)\\
+		&=(H(X)-H(X|W))-(H(X|Y)-H(X|W,Y))\\
+		&=H(X)-H(X|Y)\\
+		&=I(X;Y)
+	\end{split}
+\end{equation*}
+where $H(X|W,Y)=H(X|W)=0$, for $X$ is a function of $W$.\\
+
+Hence we can achieve the information rate using proposed MLC and
+\begin{equation*}
+	I(X;Y)=I(W;Y)
+\end{equation*}
+
+This proof shows that the deterministic mapping from $W$ to $X$ does not
+incur a rate loss. Random binary linear codes can achieve the information rate $I(W;Y)$, that is 
+random binary linear code can achieve $I(X;Y)$ when $X$ is non-uniform distribution by
+deterministic mapper.
+
+\section*{Simulation result}
+My simulation is based on binary symmetric broadcast channel with LDPC belief propagation decoding 
+algorithm. In this simulation, $\mathbf{H}$ is $128\times256$
+regular parity check matrix which is downloaded from web. We set codewords $x_U^n$ and $x_V^n$ are all-zero
+with length 256, since all-zero is definitely codeword in every codebook. The simulation results are as Figure.2 and Figure.3.\\
+
+  \begin{figure}
+\centering
+  \includegraphics[width=0.6\textwidth]{2.eps}
+ \caption{Performance of Linear codes $X_U$ on BSBC, $n=256, k=128, R=\frac{128}{256}=\frac{1}{2}$}
+\label{2}
+\end{figure}
+  \begin{figure}
+\centering
+  \includegraphics[width=0.6\textwidth]{2.eps}
+ \caption{Performance of Multilevel codes $X_V$ on BSBC, $n=256, k=128, R=\frac{128}{256}=\frac{1}{2}$}
+\label{3}
+\end{figure}
+
+Actually, the simulation results for $X_U$ and $X_V$ are almost same, since $X_U$ and $X_V$ are all-zero
+codewords and then all-zero codewords have no effect on each other when decoding. If we want more realistic simulation,
+we can encode and transmit random bits, however encoding is not an easy job
+ and we need to design generator matrices and new parity check matrices.
+ 
+\end{document}
+
